@@ -1,1 +1,2 @@
-# nexjs_docker_traefik_fastapi
+# nextjs_docker_traefik
+Quick and easy self hostable nextjs instance

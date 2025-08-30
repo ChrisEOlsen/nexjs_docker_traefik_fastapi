@@ -1,0 +1,30 @@
+services:
+  nextjs-site:
+    build: .
+    container_name: my-nextjs-site # You can change this
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      # Redirect HTTP → HTTPS
+      - "traefik.http.routers.resume.entrypoints=web"
+      - "traefik.http.routers.resume.rule=Host(`resume.chrisolsenweb.com`)" 
+      - "traefik.http.routers.resume.middlewares=redirect-to-https"
+
+      # HTTPS Router – secure headers only
+      - "traefik.http.routers.resume-secure.entrypoints=websecure"
+      - "traefik.http.routers.resume-secure.rule=Host(`resume.chrisolsenweb.com`)" 
+      - "traefik.http.routers.resume-secure.tls=true"
+      - "traefik.http.routers.resume-secure.tls.certresolver=cloudflare" 
+      - "traefik.http.routers.resume-secure.middlewares=secure-headers"
+      - "traefik.http.routers.resume-secure.service=resume-service"
+
+      # Internal service port for Next.js
+      - "traefik.http.services.resume-service.loadbalancer.server.port=3000"
+
+networks:
+  proxy:
+    external: true
